@@ -1,5 +1,6 @@
 package gaarnik.hearthstone.common.item;
 
+import gaarnik.hearthstone.client.HearthstoneClientProxy;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -13,6 +14,8 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 public class HearthstoneItem extends Item {
 	// *******************************************************************
 	public static final int HEARTHSTONE_ID = 1500;
+	
+	private static final int MAX_DAMAGE = 10;
 
 	// *******************************************************************
 
@@ -22,11 +25,12 @@ public class HearthstoneItem extends Item {
 		
 		this.setItemName("hearthstoneItem");
 		this.setIconIndex(0);
+		this.setMaxDamage(MAX_DAMAGE);
 	}
 
 	// *******************************************************************
 	@Override
-	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int par7, float par8, float par9, float par10) {
+	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int par7, float xRot, float yRot, float zRot) {
 		if(world.isRemote)
 			return false;
 		
@@ -49,6 +53,10 @@ public class HearthstoneItem extends Item {
 			nbt.setDouble("playerY", position.yCoord);
 			nbt.setDouble("playerZ", position.zCoord);
 			
+			nbt.setFloat("rotationYaw", player.rotationYaw);
+			nbt.setFloat("rotationYawHead", player.rotationYawHead);
+			nbt.setFloat("rotationPitch", player.rotationPitch);
+			
 			nbt.setBoolean("initialized", true);
 			
 			player.addChatMessage("Hearthstone linked !");
@@ -62,8 +70,10 @@ public class HearthstoneItem extends Item {
 		if(world.isRemote)
 			return stack;
 		
-		if(stack.hasTagCompound() == false)
+		if(stack.hasTagCompound() == false) {
+			player.addChatMessage("You have not linked your Hearthstone !");
 			return stack;
+		}
 		
 		NBTTagCompound nbt = stack.getTagCompound();
 		
@@ -84,12 +94,18 @@ public class HearthstoneItem extends Item {
 		}
 		
 		player.addChatMessage("Teleporting to home ...");
+
+		player.rotationYaw = nbt.getFloat("rotationYaw");
+		player.rotationYawHead = nbt.getFloat("rotationYawHead");
+		player.rotationPitch = nbt.getFloat("rotationPitch");
 		
 		double xCoord = nbt.getDouble("playerX");
 		double yCoord = nbt.getDouble("playerY");
 		double zCoord = nbt.getDouble("playerZ");
-		
+
 		player.setPositionAndUpdate(xCoord, yCoord, zCoord);
+		
+		stack.damageItem(1, player);
 		
 		return stack;
 	}
@@ -111,9 +127,12 @@ public class HearthstoneItem extends Item {
 
 	// *******************************************************************
 	@Override
-	public String getTextureFile() {
-		// TODO Auto-generated method stub
-		return super.getTextureFile();
-	}
+	public String getTextureFile() { return HearthstoneClientProxy.ITEMS_TEXTURE; }
+	
+	@Override
+	public int getItemStackLimit() { return 1; }
+	
+	@Override
+	public boolean isDamageable() { return true; }
 
 }
