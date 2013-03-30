@@ -1,5 +1,6 @@
 package gaarnik.hearthstone.common;
 
+import gaarnik.hearthstone.common.item.HearthstoneItems;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
@@ -22,16 +23,14 @@ public class ModHearthstone {
 	// *******************************************************************
 
 	// *******************************************************************
-
-	// *******************************************************************
 	@PreInit
 	public void preInit(FMLPreInitializationEvent event) {
-		
+		//charger le fichier de config
 	}
 	
 	@Init
 	public void init(FMLInitializationEvent event) {
-		
+		HearthstoneItems.init();
 	}
 	
 	@PostInit
