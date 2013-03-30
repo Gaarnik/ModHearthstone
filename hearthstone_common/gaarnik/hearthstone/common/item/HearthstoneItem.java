@@ -4,6 +4,7 @@ import gaarnik.hearthstone.client.HearthstoneClientProxy;
 import gaarnik.hearthstone.common.ModHearthstone;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -25,7 +26,7 @@ public class HearthstoneItem extends Item {
 	// *******************************************************************
 	public HearthstoneItem() {
 		super(HEARTHSTONE_ID);
-
+		
 		this.setItemName("hearthstoneItem");
 		this.setIconIndex(0);
 		this.setMaxDamage(MAX_DAMAGE);
@@ -74,6 +75,9 @@ public class HearthstoneItem extends Item {
 	public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
 		if(world.isRemote)
 			return stack;
+		
+		if(player.getItemInUseCount() != 0)
+			return stack;
 
 		PotionEffect sicknessEffect = player.getActivePotionEffect(ModHearthstone.heathstonePotion);
 
@@ -90,9 +94,9 @@ public class HearthstoneItem extends Item {
 			player.addChatMessage("You have not linked your Hearthstone !");
 			return stack;
 		}
-
+		
 		NBTTagCompound nbt = stack.getTagCompound();
-
+		
 		if(nbt.getBoolean("initialized")) {
 			nbt.setBoolean("initialized", false);
 			return stack;
@@ -111,13 +115,29 @@ public class HearthstoneItem extends Item {
 
 		player.addChatMessage("Teleporting to home ...");
 
+		player.setItemInUse(stack, this.getMaxItemUseDuration(stack));
+		
+		return stack;
+	}
+
+	public ItemStack onFoodEaten(ItemStack stack, World world, EntityPlayer player) {
+		if(world.isRemote)
+			return stack;
+		
+		if(stack.hasTagCompound() == false) {
+			player.addChatMessage("You have not linked your Hearthstone !");
+			return stack;
+		}
+		
+		NBTTagCompound nbt = stack.getTagCompound();
+
 		/*int dimension = nbt.getInteger("dimension");
 		EntityPlayerMP playerMP = (EntityPlayerMP) player;
-		playerMP.travelToDimension(dimension);*/
+		playerMP.travelToDimension(dimension);
 
 		player.rotationYaw = nbt.getFloat("rotationYaw");
 		player.rotationYawHead = nbt.getFloat("rotationYawHead");
-		player.rotationPitch = nbt.getFloat("rotationPitch");
+		player.rotationPitch = nbt.getFloat("rotationPitch");*/
 
 		double xCoord = nbt.getDouble("playerX");
 		double yCoord = nbt.getDouble("playerY");
@@ -129,9 +149,9 @@ public class HearthstoneItem extends Item {
 			stack.damageItem(1, player);
 			player.addPotionEffect(new PotionEffect(ModHearthstone.heathstonePotion.id, MOTION_SICKNEWW_DURATION, 0));
 		}
-
-		return stack;
-	}
+		
+    	return stack;
+    }
 
 	// *******************************************************************
 
@@ -159,5 +179,10 @@ public class HearthstoneItem extends Item {
 
 	@Override
 	public boolean isDamageable() { return true; }
+
+	@Override
+	public int getMaxItemUseDuration(ItemStack par1ItemStack) { return 32; }
+
+	public EnumAction getItemUseAction(ItemStack par1ItemStack) { return EnumAction.bow; }
 
 }
