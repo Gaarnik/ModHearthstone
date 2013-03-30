@@ -33,14 +33,20 @@ public class HearthstoneItem extends Item {
 	}
 
 	// *******************************************************************
+	/**
+	 * Cette fonction est apellée lorsque que le joueur clic sur un block
+	 */
 	@Override
 	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int par7, float xRot, float yRot, float zRot) {
-		if(world.isRemote)
+		if(world.isRemote) //seulement si l'event viens du client
 			return false;
 
 		int blockId = world.getBlockId(x, y, z);
 
+		//si le joueur a cliqué sur un lit
 		if(blockId == Block.bed.blockID) {
+			
+			//on sauvegarde les coordonnées du lit et du joeur dans les données du stack
 			if(stack.hasTagCompound() == false) {
 				NBTTagCompound nbt = new NBTTagCompound();
 				stack.setTagCompound(nbt);
@@ -71,6 +77,9 @@ public class HearthstoneItem extends Item {
 		return true;
 	}
 
+	/**
+	 * Cette méthode est apellée lorsque le joueur fait un clic droit pour tuliser la pierre
+	 */
 	@Override
 	public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
 		if(world.isRemote)
@@ -79,6 +88,7 @@ public class HearthstoneItem extends Item {
 		if(player.getItemInUseCount() != 0)
 			return stack;
 
+		//on vérifie si le joeuur n'a pas le mam des transports
 		PotionEffect sicknessEffect = player.getActivePotionEffect(ModHearthstone.heathstonePotion);
 
 		if(sicknessEffect != null) {
@@ -90,6 +100,7 @@ public class HearthstoneItem extends Item {
 				player.removePotionEffect(ModHearthstone.heathstonePotion.id);
 		}
 
+		//on récupère les infos stockées dans le stack
 		if(stack.hasTagCompound() == false) {
 			player.addChatMessage("You have not linked your Hearthstone !");
 			return stack;
@@ -108,11 +119,13 @@ public class HearthstoneItem extends Item {
 
 		int blockId = world.getBlockId(x, y, z);
 
+		//on vérifie que le  lit est toujours présent
 		if(blockId != Block.bed.blockID) {
 			player.addChatMessage("Your bed is missing !");
 			return stack;
 		}
 
+		//on déclenche l'animation de téléportation
 		player.addChatMessage("Teleporting to home ...");
 
 		player.setItemInUse(stack, this.getMaxItemUseDuration(stack));
@@ -120,6 +133,9 @@ public class HearthstoneItem extends Item {
 		return stack;
 	}
 
+	/**
+	 * Cette méthode est apellée à la fin de l'animation
+	 */
 	public ItemStack onFoodEaten(ItemStack stack, World world, EntityPlayer player) {
 		if(world.isRemote)
 			return stack;
@@ -129,6 +145,7 @@ public class HearthstoneItem extends Item {
 			return stack;
 		}
 		
+		//on récupère les données du stack pour mettre à jour la position du joueur
 		NBTTagCompound nbt = stack.getTagCompound();
 
 		/*int dimension = nbt.getInteger("dimension");
