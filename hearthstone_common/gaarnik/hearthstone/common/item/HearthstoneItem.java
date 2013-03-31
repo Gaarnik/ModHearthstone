@@ -3,6 +3,8 @@ package gaarnik.hearthstone.common.item;
 import gaarnik.hearthstone.client.HearthstoneClientProxy;
 import gaarnik.hearthstone.common.ModHearthstone;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.EntityPortalFX;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
@@ -26,91 +28,103 @@ public class HearthstoneItem extends Item {
 	// *******************************************************************
 	public HearthstoneItem() {
 		super(HEARTHSTONE_ID);
-		
+
 		this.setItemName("hearthstoneItem");
 		this.setIconIndex(0);
 		this.setMaxDamage(MAX_DAMAGE);
 	}
 
 	// *******************************************************************
-	/**
-	 * Cette fonction est apellée lorsque que le joueur clic sur un block
-	 */
 	@Override
 	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int par7, float xRot, float yRot, float zRot) {
-		if(world.isRemote) //seulement si l'event viens du client
+		if(world.isRemote)
 			return false;
 
 		int blockId = world.getBlockId(x, y, z);
 
-		//si le joueur a cliqué sur un lit
-		if(blockId == Block.bed.blockID) {
-			
-			//on sauvegarde les coordonnées du lit et du joeur dans les données du stack
-			if(stack.hasTagCompound() == false) {
-				NBTTagCompound nbt = new NBTTagCompound();
-				stack.setTagCompound(nbt);
-			}
-
-			NBTTagCompound nbt = stack.getTagCompound();
-			nbt.setInteger("bedX", x);
-			nbt.setInteger("bedY", y);
-			nbt.setInteger("bedZ", z);
-
-			Vec3 position = player.getPosition(1.0f);
-
-			nbt.setDouble("playerX", position.xCoord);
-			nbt.setDouble("playerY", position.yCoord);
-			nbt.setDouble("playerZ", position.zCoord);
-
-			nbt.setFloat("rotationYaw", player.rotationYaw);
-			nbt.setFloat("rotationYawHead", player.rotationYawHead);
-			nbt.setFloat("rotationPitch", player.rotationPitch);
-
-			//nbt.setInteger("dimension", world.getWorldInfo().getDimension());
-
-			nbt.setBoolean("initialized", true);
-
-			player.addChatMessage("Hearthstone linked !");
-		}
+		if(blockId == Block.bed.blockID)
+			this.linkHearhtstone(stack, player, x, y, z);
 
 		return true;
 	}
 
-	/**
-	 * Cette méthode est apellée lorsque le joueur fait un clic droit pour tuliser la pierre
-	 */
 	@Override
 	public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
-		if(world.isRemote)
-			return stack;
-		
-		if(player.getItemInUseCount() != 0)
-			return stack;
+		if(world.isRemote == false) {
+			if(player.getItemInUseCount() != 0)
+				return stack;
 
-		//on vérifie si le joeuur n'a pas le mam des transports
+			if(this.canUseHearthstone(player) == false)
+				return stack;
+
+			if(this.canTeleport(world, stack, player) == false)
+				return stack;
+		}
+
+		player.setItemInUse(stack, this.getMaxItemUseDuration(stack));
+
+		return stack;
+
+	}
+
+	public ItemStack onFoodEaten(ItemStack stack, World world, EntityPlayer player) {
+		this.teleportPlayer(world, player, stack);
+
+		return stack;
+	}
+
+	// *******************************************************************
+	private void linkHearhtstone(ItemStack stack, EntityPlayer player, int bedX, int bedY, int bedZ) {
+		if(stack.hasTagCompound() == false) {
+			NBTTagCompound nbt = new NBTTagCompound();
+			stack.setTagCompound(nbt);
+		}
+
+		NBTTagCompound nbt = stack.getTagCompound();
+		nbt.setInteger("bedX", bedX);
+		nbt.setInteger("bedY", bedY);
+		nbt.setInteger("bedZ", bedZ);
+
+		Vec3 position = player.getPosition(1.0f);
+
+		nbt.setDouble("playerX", position.xCoord);
+		nbt.setDouble("playerY", position.yCoord);
+		nbt.setDouble("playerZ", position.zCoord);
+
+		nbt.setFloat("rotationYaw", player.rotationYaw);
+		nbt.setFloat("rotationYawHead", player.rotationYawHead);
+
+		nbt.setBoolean("initialized", true);
+
+		player.addChatMessage("Hearthstone linked !");
+	}
+
+	private boolean canUseHearthstone(EntityPlayer player) {
 		PotionEffect sicknessEffect = player.getActivePotionEffect(ModHearthstone.heathstonePotion);
 
 		if(sicknessEffect != null) {
 			if(sicknessEffect.getDuration() != 0) {
 				player.addChatMessage("You have motion sickness !");
-				return stack;
+				return false;
 			}
 			else
 				player.removePotionEffect(ModHearthstone.heathstonePotion.id);
 		}
+		
+		return true;
+	}
 
-		//on récupère les infos stockées dans le stack
+	private boolean canTeleport(World world, ItemStack stack, EntityPlayer player) {
 		if(stack.hasTagCompound() == false) {
 			player.addChatMessage("You have not linked your Hearthstone !");
-			return stack;
+			return false;
 		}
-		
+
 		NBTTagCompound nbt = stack.getTagCompound();
-		
+
 		if(nbt.getBoolean("initialized")) {
 			nbt.setBoolean("initialized", false);
-			return stack;
+			return false;
 		}
 
 		int x = nbt.getInteger("bedX");
@@ -119,42 +133,44 @@ public class HearthstoneItem extends Item {
 
 		int blockId = world.getBlockId(x, y, z);
 
-		//on vérifie que le  lit est toujours présent
 		if(blockId != Block.bed.blockID) {
 			player.addChatMessage("Your bed is missing !");
-			return stack;
+			return false;
 		}
 
-		//on déclenche l'animation de téléportation
 		player.addChatMessage("Teleporting to home ...");
-
-		player.setItemInUse(stack, this.getMaxItemUseDuration(stack));
 		
-		return stack;
+		return true;
 	}
-
-	/**
-	 * Cette méthode est apellée à la fin de l'animation
-	 */
-	public ItemStack onFoodEaten(ItemStack stack, World world, EntityPlayer player) {
-		if(world.isRemote)
-			return stack;
-		
+	
+	private void teleportPlayer(World world, EntityPlayer player, ItemStack stack) {
 		if(stack.hasTagCompound() == false) {
 			player.addChatMessage("You have not linked your Hearthstone !");
-			return stack;
+			return;
 		}
 		
-		//on récupère les données du stack pour mettre à jour la position du joueur
 		NBTTagCompound nbt = stack.getTagCompound();
+		
+		int x = nbt.getInteger("bedX");
+		int y = nbt.getInteger("bedY");
+		int z = nbt.getInteger("bedZ");
+
+		int blockId = world.getBlockId(x, y, z);
+
+		if(blockId != Block.bed.blockID) {
+			player.addChatMessage("Your bed is missing !");
+			return;
+		}
 
 		/*int dimension = nbt.getInteger("dimension");
 		EntityPlayerMP playerMP = (EntityPlayerMP) player;
-		playerMP.travelToDimension(dimension);
+		playerMP.travelToDimension(dimension);*/
 
 		player.rotationYaw = nbt.getFloat("rotationYaw");
 		player.rotationYawHead = nbt.getFloat("rotationYawHead");
-		player.rotationPitch = nbt.getFloat("rotationPitch");*/
+
+		Vec3 position = player.getPosition(1.0f);
+		this.spawnParticles(world, position.xCoord, position.yCoord, position.zCoord);
 
 		double xCoord = nbt.getDouble("playerX");
 		double yCoord = nbt.getDouble("playerY");
@@ -166,11 +182,14 @@ public class HearthstoneItem extends Item {
 			stack.damageItem(1, player);
 			player.addPotionEffect(new PotionEffect(ModHearthstone.heathstonePotion.id, MOTION_SICKNEWW_DURATION, 0));
 		}
-		
-    	return stack;
-    }
 
-	// *******************************************************************
+		this.spawnParticles(world, xCoord, yCoord, zCoord);
+	}
+	
+	private void spawnParticles(World world, double x, double y, double z) {
+		EntityPortalFX effect = new EntityPortalFX(world, x, y, z, 1.0D, 0.0D, 0.0D);
+		Minecraft.getMinecraft().effectRenderer.addEffect(effect, null);
+	}
 
 	// *******************************************************************
 	public static void init() {
