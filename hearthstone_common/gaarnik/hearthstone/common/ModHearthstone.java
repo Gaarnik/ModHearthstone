@@ -1,10 +1,13 @@
 package gaarnik.hearthstone.common;
 
+import gaarnik.hearthstone.common.achievement.HearthstoneAchievementPage;
+import gaarnik.hearthstone.common.item.HearthstoneItems;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 import net.minecraft.potion.Potion;
-import gaarnik.hearthstone.common.item.HearthstoneItems;
+import net.minecraftforge.common.Configuration;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
@@ -22,7 +25,7 @@ import cpw.mods.fml.common.network.NetworkMod;
 @NetworkMod(clientSideRequired = true, serverSideRequired = true)
 public class ModHearthstone {
 	// *******************************************************************
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	// *******************************************************************
 	@SidedProxy(clientSide = "gaarnik.hearthstone.client.HearthstoneClientProxy", serverSide = "gaarnik.hearthstone.server.HearthstoneServerProxy")
@@ -30,13 +33,20 @@ public class ModHearthstone {
 
 	@Instance("ModHearthstone")
 	public static ModHearthstone instance = new ModHearthstone();
+	
+	public static Configuration config;
 
 	// *******************************************************************
-	public static Potion heathstonePotion;
+	public static HearthstoneAchievementPage hearthstonePage;
+	
+	public static Potion hearthstonePotion;
 
 	// *******************************************************************
 	@PreInit
 	public void preInit(FMLPreInitializationEvent event) {
+		ModHearthstone.config = new Configuration(event.getSuggestedConfigurationFile());
+		ModHearthstone.config.load();
+		
 		Potion[] potionTypes = null;
 
 		for (Field f : Potion.class.getDeclaredFields()) {
@@ -67,12 +77,14 @@ public class ModHearthstone {
 
 		HearthstoneItems.init();
 		
-		heathstonePotion = new HearthstonePotion();
+		hearthstonePage = new HearthstoneAchievementPage();
+		
+		hearthstonePotion = new HearthstonePotion();
 	}
 
 	@PostInit
 	public void postInit(FMLPostInitializationEvent event) {
-
+		ModHearthstone.config.save();
 	}
 
 	@ServerStarting

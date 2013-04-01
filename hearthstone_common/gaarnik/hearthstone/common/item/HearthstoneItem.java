@@ -18,16 +18,14 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 
 public class HearthstoneItem extends Item {
 	// *******************************************************************
-	public static final int HEARTHSTONE_ID = 1500;
-
-	private static final int MAX_DAMAGE = 10;
+	private static final int MAX_DAMAGE = 50;
 	private static final int MOTION_SICKNEWW_DURATION = 12000;
 
 	// *******************************************************************
 
 	// *******************************************************************
-	public HearthstoneItem() {
-		super(HEARTHSTONE_ID);
+	public HearthstoneItem(int id) {
+		super(id);
 
 		this.setItemName("hearthstoneItem");
 		this.setIconIndex(0);
@@ -54,10 +52,10 @@ public class HearthstoneItem extends Item {
 			if(player.getItemInUseCount() != 0)
 				return stack;
 
-			if(this.canUseHearthstone(player) == false)
+			if(this.canTeleport(world, stack, player) == false)
 				return stack;
 
-			if(this.canTeleport(world, stack, player) == false)
+			if(this.canUseHearthstone(player) == false)
 				return stack;
 		}
 
@@ -100,7 +98,7 @@ public class HearthstoneItem extends Item {
 	}
 
 	private boolean canUseHearthstone(EntityPlayer player) {
-		PotionEffect sicknessEffect = player.getActivePotionEffect(ModHearthstone.heathstonePotion);
+		PotionEffect sicknessEffect = player.getActivePotionEffect(ModHearthstone.hearthstonePotion);
 
 		if(sicknessEffect != null) {
 			if(sicknessEffect.getDuration() != 0) {
@@ -108,7 +106,7 @@ public class HearthstoneItem extends Item {
 				return false;
 			}
 			else
-				player.removePotionEffect(ModHearthstone.heathstonePotion.id);
+				player.removePotionEffect(ModHearthstone.hearthstonePotion.id);
 		}
 		
 		return true;
@@ -180,7 +178,7 @@ public class HearthstoneItem extends Item {
 
 		if(ModHearthstone.DEBUG == false) {
 			stack.damageItem(1, player);
-			player.addPotionEffect(new PotionEffect(ModHearthstone.heathstonePotion.id, MOTION_SICKNEWW_DURATION, 0));
+			player.addPotionEffect(new PotionEffect(ModHearthstone.hearthstonePotion.id, MOTION_SICKNEWW_DURATION, 0));
 		}
 
 		this.spawnParticles(world, xCoord, yCoord, zCoord);
@@ -193,13 +191,29 @@ public class HearthstoneItem extends Item {
 
 	// *******************************************************************
 	public static void init() {
-		HearthstoneItems.hearthstoneItem = new HearthstoneItem();
+		int id = ModHearthstone.config.getItem("HearthstoneItem", HearthstoneItems.HEARTHSTONE_ID).getInt();
+		HearthstoneItems.hearthstoneItem = new HearthstoneItem(id);
 
 		GameRegistry.registerItem(HearthstoneItems.hearthstoneItem, "hearthstoneItem");
 		LanguageRegistry.addName(HearthstoneItems.hearthstoneItem, "Hearthstone");
 
 		ItemStack stack = new ItemStack(HearthstoneItems.hearthstoneItem, 1);
+		
+		ItemStack lapisStack = new ItemStack(Item.dyePowder, 1);
+		lapisStack.setItemDamage(4);
 
+		ItemStack redstoneStack = new ItemStack(Item.redstone, 1);
+		ItemStack glowStack = new ItemStack(Item.lightStoneDust, 1);
+		ItemStack diamonStack = new ItemStack(Item.diamond, 1);
+
+		GameRegistry.addRecipe(stack, new Object[] {
+				"XYX", "ZAZ", "XYX", 'X', redstoneStack, 'Y', glowStack, 'Z', lapisStack, 'A', diamonStack
+		});
+
+		GameRegistry.addRecipe(stack, new Object[] {
+				"XYX", "ZAZ", "XYX", 'X', redstoneStack, 'Y', lapisStack, 'Z', glowStack, 'A', diamonStack
+		});
+		
 		if(ModHearthstone.DEBUG) {
 			ItemStack dirstStack = new ItemStack(Block.dirt, 1);
 			GameRegistry.addShapelessRecipe(stack, dirstStack);
