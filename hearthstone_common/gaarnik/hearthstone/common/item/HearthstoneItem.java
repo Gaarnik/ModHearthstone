@@ -182,6 +182,8 @@ public class HearthstoneItem extends Item {
 		}
 
 		this.spawnParticles(world, xCoord, yCoord, zCoord);
+		
+		player.addStat(ModHearthstone.hearthstonePage.use, 1);
 	}
 	
 	private void spawnParticles(World world, double x, double y, double z) {

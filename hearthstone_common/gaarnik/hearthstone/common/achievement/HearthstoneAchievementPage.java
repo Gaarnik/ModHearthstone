@@ -14,9 +14,12 @@ import net.minecraftforge.common.AchievementPage;
 public class HearthstoneAchievementPage extends AchievementPage {
 	// *******************************************************************
 	private static final String NAME = "Hearthstone";
-
+	
 	// *******************************************************************
 	ArrayList<Achievement> achievements;
+
+	public Achievement craft;
+	public Achievement use;
 
 	// *******************************************************************
 	public HearthstoneAchievementPage() {
@@ -35,14 +38,16 @@ public class HearthstoneAchievementPage extends AchievementPage {
 	private void initAchievements() {
 		this.achievements = new ArrayList<Achievement>();
 		
-		Achievement craft = new Achievement(2001, "Hearthstone.craft", 0, 0, new ItemStack(HearthstoneItems.hearthstoneItem, 1), null);
-		LanguageRegistry.instance().addStringLocalization("achievement." + craft, "en_US", "A new Travel !");
-		LanguageRegistry.instance().addStringLocalization("achievement." + craft + ".desc", "en_US", "Craft the Heathstone");
+		craft = new Achievement(2001, "Hearthstone.craft", 0, 0, new ItemStack(HearthstoneItems.hearthstoneItem, 1), null);
+		LanguageRegistry.instance().addStringLocalization("achievement.Hearthstone.craft", "en_US", "A new Travel !");
+		LanguageRegistry.instance().addStringLocalization("achievement.Hearthstone.craft.desc", "en_US", "Craft the Heathstone");
+		craft.registerAchievement();
 		this.achievements.add(craft);
 
-		Achievement use = new Achievement(2002, "Hearthstone.use", -2, -2, new ItemStack(HearthstoneItems.hearthstoneItem, 1), craft);
-		LanguageRegistry.instance().addStringLocalization("achievement." + use, "en_US", "Motion sickness !");
-		LanguageRegistry.instance().addStringLocalization("achievement." + use + ".desc", "en_US", "Use the Heathstone");
+		use = new Achievement(2002, "Hearthstone.use", -2, -2, new ItemStack(HearthstoneItems.hearthstoneItem, 1), craft);
+		LanguageRegistry.instance().addStringLocalization("achievement.Hearthstone.use", "en_US", "Motion sickness !");
+		LanguageRegistry.instance().addStringLocalization("achievement.Hearthstone.use.desc", "en_US", "Use the Heathstone");
+		use.registerAchievement();
 		this.achievements.add(use);
 	}
 
