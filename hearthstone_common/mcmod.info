@@ -1,0 +1,21 @@
+[
+{
+  "modid": "ModHearthstone",
+  "name": "ModHearthstone",
+  "description": "A simple mod who add a Hearthstone in Minecraft.",
+  "version": "@VERSION@",
+  "url": "https://github.com/Gaarnik/ModHearthstone",
+  "updateUrl": "",
+  "authorList": [
+    "Gaarnik",
+    "Asceliopos"
+  ],
+  "credits": "By Gaarnik, textures mades by Asceliopos",
+  "logoFile": "",
+  "screenshots": [
+  ],
+  "parent":"",
+  "dependencies": [
+  ]
+}
+]

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?> 
-<project name="BSA Mod">
+<project name="ModHearthstone">
 
 	<property file="build.properties" />
 
@@ -11,7 +11,7 @@
 
 	<target name="build">
 		<copy todir="${dir.development}\mcp\src\minecraft">
-			<fileset dir="${dir.development}\sources\bsamod\common\" />
+			<fileset dir="${dir.development}\sources\ModHearthstone\hearthstone_common\" />
 		</copy>
 		<replace dir="${dir.development}\mcp\src\minecraft" token="@VERSION@" value="${release.mod.version}" />
 	</target>
@@ -55,10 +55,10 @@
 
 		<!-- Build the jar -->
 		<mkdir dir="${dir.share}\${release.minecraft.version}\${release.mod.version}" />
-		<jar destfile="${dir.share}\${release.minecraft.version}\${release.mod.version}\bsamod-universal-${release.mod.version}.jar">
+		<jar destfile="${dir.share}\${release.minecraft.version}\${release.mod.version}\modhearthstone-universal-${release.mod.version}.jar">
 			<fileset dir="${dir.development}\mcp\src\common\"	includes="mcmod.info" />
 			<fileset dir="${dir.development}\mcp\reobf\minecraft" />
-			<fileset dir="${dir.development}\sources\bsamod\resources" />
+			<fileset dir="${dir.development}\sources\ModHearthstone\hearthstone_resources" />
 		</jar>
 
 		<!-- Clean up the MCP source now that we are done -->
@@ -74,7 +74,7 @@
 
 		<!-- Build the jar -->
 		<mkdir dir="${dir.release}\${release.minecraft.version}\${release.mod.version}" />
-		<jar destfile="${dir.release}\${release.minecraft.version}\${release.mod.version}\bsamod-universal-${release.mod.version}.jar">
+		<jar destfile="${dir.release}\${release.minecraft.version}\${release.mod.version}\modhearhstone-universal-${release.mod.version}.jar">
 			<fileset dir="${dir.development}\mcp\src\minecraft\" includes="mcmod.info" />
 			<fileset dir="${dir.development}\mcp\reobf\minecraft" />
 			<fileset dir="${dir.development}\sources\bsamod\resources" />
