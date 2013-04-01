@@ -22,7 +22,7 @@ import cpw.mods.fml.common.network.NetworkMod;
 @NetworkMod(clientSideRequired = true, serverSideRequired = true)
 public class ModHearthstone {
 	// *******************************************************************
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	// *******************************************************************
 	@SidedProxy(clientSide = "gaarnik.hearthstone.client.HearthstoneClientProxy", serverSide = "gaarnik.hearthstone.server.HearthstoneServerProxy")
