@@ -8,6 +8,7 @@ import java.lang.reflect.Modifier;
 
 import net.minecraft.potion.Potion;
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
@@ -52,9 +53,12 @@ public class ModHearthstone {
 
 		for (Field f : Potion.class.getDeclaredFields()) {
 			f.setAccessible(true);
+			
+			System.out.println("---------" + f.getName());
 
 			try {
-				if (f.getName().equals("potionTypes") || f.getName().equals("field_76425_a")) {
+				//if (f.getName().equals("potionTypes") || f.getName().equals("field_76425_a")) {
+				if (f.getName().equals("potionTypes") || f.getName().equals("a")) {
 					Field modfield = Field.class.getDeclaredField("modifiers");
 					modfield.setAccessible(true);
 					modfield.setInt(f, f.getModifiers() & ~Modifier.FINAL);

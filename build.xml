@@ -77,7 +77,7 @@
 		<jar destfile="${dir.release}\${release.minecraft.version}\${release.mod.version}\modhearhstone-universal-${release.mod.version}.jar">
 			<fileset dir="${dir.development}\mcp\src\minecraft\" includes="mcmod.info" />
 			<fileset dir="${dir.development}\mcp\reobf\minecraft" />
-			<fileset dir="${dir.development}\sources\bsamod\resources" />
+			<fileset dir="${dir.development}\sources\ModHearthstone\hearthstone_resources" />
 		</jar>
 
 		<!-- Clean up the MCP source now that we are done -->
