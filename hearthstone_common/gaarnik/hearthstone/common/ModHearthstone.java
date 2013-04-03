@@ -26,7 +26,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 @NetworkMod(clientSideRequired = true, serverSideRequired = true)
 public class ModHearthstone {
 	// *******************************************************************
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	// *******************************************************************
 	@SidedProxy(clientSide = "gaarnik.hearthstone.client.HearthstoneClientProxy", serverSide = "gaarnik.hearthstone.server.HearthstoneServerProxy")

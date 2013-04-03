@@ -14,6 +14,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
@@ -99,6 +100,9 @@ public class HearthstoneItem extends Item {
 	}
 
 	private boolean canUseHearthstone(EntityPlayer player) {
+		if(ModHearthstone.DEBUG)
+			return true;
+		
 		PotionEffect sicknessEffect = player.getActivePotionEffect(ModHearthstone.hearthstonePotion);
 
 		if(sicknessEffect != null) {
@@ -179,7 +183,9 @@ public class HearthstoneItem extends Item {
 
 		if(ModHearthstone.DEBUG == false) {
 			stack.damageItem(1, player);
-			player.addPotionEffect(new PotionEffect(ModHearthstone.hearthstonePotion.id, MOTION_SICKNEWW_DURATION, 0));
+			
+			if(player.capabilities.isCreativeMode == false)
+				player.addPotionEffect(new PotionEffect(ModHearthstone.hearthstonePotion.id, MOTION_SICKNEWW_DURATION, 0));
 		}
 
 		this.spawnParticles(world, xCoord, yCoord, zCoord);
@@ -194,8 +200,14 @@ public class HearthstoneItem extends Item {
 	}
 	
 	private void playTeleportSound(World world, double x, double y, double z) {
-		world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, HearthstoneSoundHandler.TELEPORT_SOUND, 
-				1.0F, world.rand.nextFloat() * 0.1F + 0.9F);
+		if(world.isRemote)
+			return;
+		
+		//world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, HearthstoneSoundHandler.TELEPORT_SOUND, 
+				//1.0F, world.rand.nextFloat() * 0.1F + 0.9F);
+		
+		FMLClientHandler.instance().getClient().sndManager.playSound(HearthstoneSoundHandler.TELEPORT_SOUND, 
+				(float) x, (float) y, (float) z, 1.0F, 1.0F);
 	}
 
 	// *******************************************************************
