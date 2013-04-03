@@ -1,6 +1,7 @@
 package gaarnik.hearthstone.client;
 
 import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.common.MinecraftForge;
 import gaarnik.hearthstone.common.HearthstoneCommonProxy;
 
 
@@ -15,6 +16,12 @@ public class HearthstoneClientProxy extends HearthstoneCommonProxy {
 	public void initTextures() {
 		MinecraftForgeClient.preloadTexture(ITEMS_TEXTURE);
 		MinecraftForgeClient.preloadTexture(INV_TEXTURE);
+	}
+
+	// *******************************************************************
+	@Override
+	public void registerSoundHandler() {
+		MinecraftForge.EVENT_BUS.register(new HearthstoneSoundHandler());
 	}
 
 }
