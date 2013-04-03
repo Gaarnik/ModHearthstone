@@ -5,5 +5,9 @@ public class HearthstoneCommonProxy {
 	public void initTextures() {
 		
 	}
+	
+	public void registerSoundHandler() {
+		
+	}
 
 }

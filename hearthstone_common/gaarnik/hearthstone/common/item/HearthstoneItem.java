@@ -1,6 +1,7 @@
 package gaarnik.hearthstone.common.item;
 
 import gaarnik.hearthstone.client.HearthstoneClientProxy;
+import gaarnik.hearthstone.client.HearthstoneSoundHandler;
 import gaarnik.hearthstone.common.ModHearthstone;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -182,6 +183,7 @@ public class HearthstoneItem extends Item {
 		}
 
 		this.spawnParticles(world, xCoord, yCoord, zCoord);
+		this.playTeleportSound(world, xCoord, yCoord, zCoord);
 		
 		player.addStat(ModHearthstone.hearthstonePage.use, 1);
 	}
@@ -189,6 +191,11 @@ public class HearthstoneItem extends Item {
 	private void spawnParticles(World world, double x, double y, double z) {
 		EntityPortalFX effect = new EntityPortalFX(world, x, y, z, 1.0D, 0.0D, 0.0D);
 		Minecraft.getMinecraft().effectRenderer.addEffect(effect, null);
+	}
+	
+	private void playTeleportSound(World world, double x, double y, double z) {
+		world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, HearthstoneSoundHandler.TELEPORT_SOUND, 
+				1.0F, world.rand.nextFloat() * 0.1F + 0.9F);
 	}
 
 	// *******************************************************************
