@@ -1,6 +1,7 @@
 package gaarnik.hearthstone.common;
 
 import gaarnik.hearthstone.common.achievement.HearthstoneAchievementPage;
+import gaarnik.hearthstone.common.item.HearthstoneItem;
 import gaarnik.hearthstone.common.item.HearthstoneItems;
 
 import java.lang.reflect.Field;
@@ -26,10 +27,10 @@ import cpw.mods.fml.common.registry.GameRegistry;
 @NetworkMod(clientSideRequired = true, serverSideRequired = true)
 public class ModHearthstone {
 	// *******************************************************************
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	// *******************************************************************
-	@SidedProxy(clientSide = "gaarnik.hearthstone.client.HearthstoneClientProxy", serverSide = "gaarnik.hearthstone.server.HearthstoneServerProxy")
+	@SidedProxy(clientSide="gaarnik.hearthstone.client.HearthstoneClientProxy", serverSide="gaarnik.hearthstone.server.HearthstoneServerProxy")
 	public static HearthstoneCommonProxy proxy;
 
 	@Instance("ModHearthstone")
@@ -56,6 +57,9 @@ public class ModHearthstone {
 	@Init
 	public void init(FMLInitializationEvent event) {
 		proxy.initTextures();
+		
+		int id = ModHearthstone.config.getItem("HearthstoneItem", HearthstoneItems.HEARTHSTONE_ID).getInt();
+		HearthstoneItems.hearthstoneItem = new HearthstoneItem(id);
 
 		HearthstoneItems.init();
 		

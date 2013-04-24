@@ -17,6 +17,8 @@ import net.minecraft.world.World;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class HearthstoneItem extends Item {
 	// *******************************************************************
@@ -194,6 +196,7 @@ public class HearthstoneItem extends Item {
 		player.addStat(ModHearthstone.hearthstonePage.use, 1);
 	}
 	
+	@SideOnly(Side.CLIENT)
 	private void spawnParticles(World world, double x, double y, double z) {
 		EntityPortalFX effect = new EntityPortalFX(world, x, y, z, 1.0D, 0.0D, 0.0D);
 		Minecraft.getMinecraft().effectRenderer.addEffect(effect, null);
